@@ -75,6 +75,8 @@ class ProposalRecord:
     proposal_event_id: uuid.UUID | None = None
     decision_event_id: uuid.UUID | None = None
     allowed: bool = False
+    tainted: bool = False
+    approval_granted: bool | None = None
 
 
 @dataclass
@@ -87,6 +89,8 @@ class LedgerEntry:
     decision_event_id: uuid.UUID | None
     executed_event_id: uuid.UUID | None = None
     outbox_message_id: uuid.UUID | None = None
+    tainted: bool = False
+    approval_granted: bool | None = None
 
 
 class CaseWorld:
@@ -117,6 +121,12 @@ class CaseWorld:
             return self._get_customer(args.customer_id)
         if tool == "send_email":
             return self._send_email(args.to, args.subject, args.body, call_id)
+        if tool == "make_payment":
+            return self._make_payment(args.amount, args.beneficiary, args.approval_id, call_id)
+        if tool == "admin_action":
+            return self._admin_action(args.action, getattr(args, "target", None), call_id)
+        if tool == "write_memory":
+            return self._write_memory(args.key, args.value, call_id)
         raise ValueError("unknown tool")  # unreachable: the gateway validates tool names
 
     # -- private raw handlers ----------------------------------------------------
@@ -146,3 +156,12 @@ class CaseWorld:
         self.outbox.append(message)  # mock effect only; nothing is ever sent
         return RawResult(content={"status": "accepted_by_mock_outbox", "message_id": str(message.id)},
                          outbox_message=message)
+
+    def _make_payment(self, amount: int, beneficiary: str, approval_id: str | None, call_id: str) -> RawResult:
+        return RawResult(content={"status": "payment_processed", "transaction_id": f"tx_{call_id}", "amount": amount})
+
+    def _admin_action(self, action: str, target: str | None, call_id: str) -> RawResult:
+        return RawResult(content={"status": "action_executed", "action": action, "target": target})
+
+    def _write_memory(self, key: str, value: str, call_id: str) -> RawResult:
+        return RawResult(content={"status": "memory_updated", "key": key})

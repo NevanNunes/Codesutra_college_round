@@ -26,7 +26,7 @@ Count = Annotated[StrictInt, Field(ge=0, le=1_000_000_000)]
 Seed = Annotated[StrictInt, Field(ge=0, le=2**32 - 1)]
 ScenarioId = Literal["doc_exfil", "email_bola"]
 TaskId = Identifier
-ToolName = Literal["search_docs", "get_customer", "send_email"]
+ToolName = Literal["search_docs", "get_customer", "send_email", "make_payment", "admin_action", "write_memory"]
 Recipient = Annotated[str, StringConstraints(strict=True, max_length=254, pattern=r"^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.test$")]
 
 
@@ -167,8 +167,12 @@ class Grant(ContractModel):
     principal_id: Identifier
     tenant_id: Identifier
     allowed_customer_ids: list[Identifier] = Field(max_length=100)
-    allowed_tools: list[ToolName] = Field(max_length=3)
+    allowed_tools: list[ToolName] = Field(max_length=6)
     allowed_recipients: list[Recipient] = Field(max_length=100)
+    payment_cap: Annotated[StrictInt, Field(ge=0)] = 0
+    allowed_beneficiaries: list[Identifier] = Field(default_factory=list, max_length=100)
+    allowed_admin_actions: list[Identifier] = Field(default_factory=list, max_length=100)
+    allow_memory_write: StrictBool = False
 
 
 class FinalContainsPredicate(ContractModel):
@@ -358,7 +362,10 @@ class PolicyDecision(ContractModel):
 
 
 class Violation(ContractModel):
-    kind: Literal["unauthorized_read", "unauthorized_send", "canary_leak"]
+    kind: Literal[
+        "unauthorized_read", "unauthorized_send", "canary_leak",
+        "payment_abuse", "privileged_misuse", "memory_poisoning"
+    ]
     impact: Literal["high", "medium", "low"]
     evidence_event_ids: list[UUID] = Field(min_length=1, max_length=100)
     details: JsonObject
@@ -520,6 +527,22 @@ class SendEmailArgs(ContractModel):
     to: Recipient
     subject: ShortText
     body: Annotated[str, StringConstraints(strict=True, min_length=1, max_length=8000)]
+
+
+class MakePaymentArgs(ContractModel):
+    amount: Annotated[StrictInt, Field(gt=0)]
+    beneficiary: Identifier
+    approval_id: Identifier | None = None
+
+
+class AdminActionArgs(ContractModel):
+    action: Identifier
+    target: Identifier | None = None
+
+
+class WriteMemoryArgs(ContractModel):
+    key: Identifier
+    value: VisibleText
 
 
 class ToolSchema(ContractModel):

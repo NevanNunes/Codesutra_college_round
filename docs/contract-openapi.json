@@ -1742,11 +1742,14 @@
               "enum": [
                 "search_docs",
                 "get_customer",
-                "send_email"
+                "send_email",
+                "make_payment",
+                "admin_action",
+                "write_memory"
               ],
               "type": "string"
             },
-            "maxItems": 3,
+            "maxItems": 6,
             "title": "Allowed Tools",
             "type": "array"
           },
@@ -1759,6 +1762,39 @@
             "maxItems": 100,
             "title": "Allowed Recipients",
             "type": "array"
+          },
+          "payment_cap": {
+            "default": 0,
+            "minimum": 0,
+            "title": "Payment Cap",
+            "type": "integer"
+          },
+          "allowed_beneficiaries": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_.:-]+$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Allowed Beneficiaries",
+            "type": "array"
+          },
+          "allowed_admin_actions": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_.:-]+$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Allowed Admin Actions",
+            "type": "array"
+          },
+          "allow_memory_write": {
+            "default": false,
+            "title": "Allow Memory Write",
+            "type": "boolean"
           }
         },
         "required": [
@@ -2679,7 +2715,10 @@
             "enum": [
               "unauthorized_read",
               "unauthorized_send",
-              "canary_leak"
+              "canary_leak",
+              "payment_abuse",
+              "privileged_misuse",
+              "memory_poisoning"
             ],
             "title": "Kind",
             "type": "string"
