@@ -1,0 +1,2732 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AgentBreak design-time contract",
+    "version": "1",
+    "description": "Only health is implemented. Other operations and bearer auth are planned, not runtime capabilities."
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "operationId": "get_api_health",
+        "x-agentbreak-implementation": "implemented",
+        "description": "Health scaffold.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scenarios": {
+      "get": {
+        "operationId": "get_api_scenarios",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenariosResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs": {
+      "post": {
+        "operationId": "post_api_runs",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "get_api_runs",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs/{id}": {
+      "get": {
+        "operationId": "get_api_runs_by_id",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunDetailResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs/{id}/events": {
+      "get": {
+        "operationId": "get_api_runs_by_id_events",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "after_seq",
+            "in": "query",
+            "schema": {
+              "default": 0,
+              "maximum": 1000000000,
+              "minimum": 0,
+              "title": "After Seq",
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs/{id}/retest": {
+      "post": {
+        "operationId": "post_api_runs_by_id_retest",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetestAccepted"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetestRequest"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs/{id}/cancel": {
+      "post": {
+        "operationId": "post_api_runs_by_id_cancel",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "202": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CancelResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    },
+    "/api/runs/{id}/export": {
+      "get": {
+        "operationId": "get_api_runs_by_id_export",
+        "x-agentbreak-implementation": "pending",
+        "description": "Design contract only; runtime route not implemented.",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReplayBundle"
+                }
+              },
+              "text/markdown": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Sanitized API error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "markdown"
+              ],
+              "default": "json"
+            }
+          }
+        ],
+        "security": [
+          {
+            "demoBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AttackCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "scenario_id": {
+            "enum": [
+              "doc_exfil",
+              "email_bola"
+            ],
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "surface": {
+            "$ref": "#/components/schemas/Surface"
+          },
+          "text": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent Id"
+          },
+          "generation": {
+            "default": 0,
+            "maximum": 12,
+            "minimum": 0,
+            "title": "Generation",
+            "type": "integer"
+          },
+          "strategy": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Strategy",
+            "type": "string"
+          },
+          "feedback_summary": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Feedback Summary"
+          },
+          "payload_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Payload Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scenario_id",
+          "source_id",
+          "surface",
+          "text",
+          "strategy",
+          "payload_sha256"
+        ],
+        "title": "AttackCandidate",
+        "type": "object"
+      },
+      "Budget": {
+        "additionalProperties": false,
+        "properties": {
+          "max_candidates": {
+            "default": 6,
+            "maximum": 12,
+            "minimum": 1,
+            "title": "Max Candidates",
+            "type": "integer"
+          },
+          "max_model_turns": {
+            "default": 6,
+            "maximum": 6,
+            "minimum": 1,
+            "title": "Max Model Turns",
+            "type": "integer"
+          },
+          "max_tool_calls": {
+            "default": 8,
+            "maximum": 8,
+            "minimum": 1,
+            "title": "Max Tool Calls",
+            "type": "integer"
+          },
+          "case_timeout_s": {
+            "default": 60,
+            "maximum": 60,
+            "minimum": 1,
+            "title": "Case Timeout S",
+            "type": "integer"
+          },
+          "run_timeout_s": {
+            "default": 300,
+            "maximum": 300,
+            "minimum": 1,
+            "title": "Run Timeout S",
+            "type": "integer"
+          },
+          "max_total_tokens": {
+            "default": 60000,
+            "maximum": 60000,
+            "minimum": 1,
+            "title": "Max Total Tokens",
+            "type": "integer"
+          }
+        },
+        "title": "Budget",
+        "type": "object"
+      },
+      "CancelResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          }
+        },
+        "required": [
+          "run_id",
+          "status"
+        ],
+        "title": "CancelResponse",
+        "type": "object"
+      },
+      "CaseResult": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "trial_id": {
+            "format": "uuid",
+            "title": "Trial Id",
+            "type": "string"
+          },
+          "scenario_id": {
+            "enum": [
+              "doc_exfil",
+              "email_bola"
+            ],
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "task_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Candidate Id"
+          },
+          "payload_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Payload Sha256"
+          },
+          "fixture_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Fixture Sha256",
+            "type": "string"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "defense": {
+            "$ref": "#/components/schemas/DefensePreset"
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CaseStatus"
+          },
+          "oracle_outcome": {
+            "$ref": "#/components/schemas/OracleOutcome"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            },
+            "maxItems": 100,
+            "title": "Violations",
+            "type": "array"
+          },
+          "attempted_violations": {
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            },
+            "maxItems": 100,
+            "title": "Attempted Violations",
+            "type": "array"
+          },
+          "benign_success": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Benign Success"
+          },
+          "final_output": {
+            "maxLength": 32000,
+            "title": "Final Output",
+            "type": "string"
+          },
+          "evidence_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Evidence Event Ids",
+            "type": "array"
+          },
+          "source_consumed": {
+            "title": "Source Consumed",
+            "type": "boolean"
+          },
+          "tool_counts": {
+            "$ref": "#/components/schemas/ToolCounts"
+          },
+          "duration_ms": {
+            "maximum": 300000,
+            "minimum": 0,
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "state_diff": {
+            "$ref": "#/components/schemas/StateDiff"
+          }
+        },
+        "required": [
+          "run_id",
+          "trial_id",
+          "scenario_id",
+          "task_id",
+          "fixture_sha256",
+          "policy_version",
+          "defense",
+          "execution_mode",
+          "status",
+          "oracle_outcome",
+          "final_output",
+          "source_consumed",
+          "tool_counts",
+          "duration_ms",
+          "usage",
+          "state_diff"
+        ],
+        "title": "CaseResult",
+        "type": "object"
+      },
+      "CaseResultPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "trial_id": {
+            "format": "uuid",
+            "title": "Trial Id",
+            "type": "string"
+          },
+          "scenario_id": {
+            "enum": [
+              "doc_exfil",
+              "email_bola"
+            ],
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "task_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "candidate_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Candidate Id"
+          },
+          "payload_sha256": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{64}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Payload Sha256"
+          },
+          "fixture_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Fixture Sha256",
+            "type": "string"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "defense": {
+            "$ref": "#/components/schemas/DefensePreset"
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CaseStatus"
+          },
+          "oracle_outcome": {
+            "$ref": "#/components/schemas/OracleOutcome"
+          },
+          "violations": {
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            },
+            "maxItems": 100,
+            "title": "Violations",
+            "type": "array"
+          },
+          "attempted_violations": {
+            "items": {
+              "$ref": "#/components/schemas/Violation"
+            },
+            "maxItems": 100,
+            "title": "Attempted Violations",
+            "type": "array"
+          },
+          "benign_success": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Benign Success"
+          },
+          "final_output": {
+            "maxLength": 32000,
+            "title": "Final Output",
+            "type": "string"
+          },
+          "evidence_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 1000,
+            "title": "Evidence Event Ids",
+            "type": "array"
+          },
+          "source_consumed": {
+            "title": "Source Consumed",
+            "type": "boolean"
+          },
+          "tool_counts": {
+            "$ref": "#/components/schemas/ToolCounts"
+          },
+          "duration_ms": {
+            "maximum": 300000,
+            "minimum": 0,
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "usage": {
+            "$ref": "#/components/schemas/Usage"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "run_id",
+          "trial_id",
+          "scenario_id",
+          "task_id",
+          "fixture_sha256",
+          "policy_version",
+          "defense",
+          "execution_mode",
+          "status",
+          "oracle_outcome",
+          "final_output",
+          "source_consumed",
+          "tool_counts",
+          "duration_ms",
+          "usage"
+        ],
+        "title": "CaseResultPublic",
+        "type": "object"
+      },
+      "CaseSpec": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "trial_id": {
+            "format": "uuid",
+            "title": "Trial Id",
+            "type": "string"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioSpec"
+          },
+          "candidate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttackCandidate"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "defense": {
+            "$ref": "#/components/schemas/DefensePreset"
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode"
+          },
+          "fixture_snapshot": {
+            "$ref": "#/components/schemas/FixtureSnapshot"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "seed": {
+            "maximum": 4294967295,
+            "minimum": 0,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "model_settings": {
+            "$ref": "#/components/schemas/ModelSettings"
+          },
+          "policy_version": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Policy Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "trial_id",
+          "scenario",
+          "defense",
+          "execution_mode",
+          "fixture_snapshot",
+          "seed",
+          "model_settings",
+          "policy_version"
+        ],
+        "title": "CaseSpec",
+        "type": "object"
+      },
+      "CaseStatus": {
+        "enum": [
+          "completed",
+          "failed",
+          "cancelled",
+          "timed_out"
+        ],
+        "title": "CaseStatus",
+        "type": "string"
+      },
+      "CustomerRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "tenant_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "order_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Order Id",
+            "type": "string"
+          },
+          "order_status": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Order Status",
+            "type": "string"
+          },
+          "internal_token": {
+            "maxLength": 256,
+            "minLength": 8,
+            "title": "Internal Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "tenant_id",
+          "order_id",
+          "order_status",
+          "internal_token"
+        ],
+        "title": "CustomerRecord",
+        "type": "object"
+      },
+      "DefensePreset": {
+        "enum": [
+          "baseline",
+          "gateway"
+        ],
+        "title": "DefensePreset",
+        "type": "string"
+      },
+      "DocumentRecord": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Id",
+            "type": "string"
+          },
+          "surface": {
+            "$ref": "#/components/schemas/Surface"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "body": {
+            "maxLength": 32000,
+            "title": "Body",
+            "type": "string"
+          },
+          "customer_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Customer Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "surface",
+          "title",
+          "body",
+          "customer_id"
+        ],
+        "title": "DocumentRecord",
+        "type": "object"
+      },
+      "EffectCountPredicate": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "effect_count",
+            "default": "effect_count",
+            "title": "Kind",
+            "type": "string"
+          },
+          "tool": {
+            "const": "send_email",
+            "default": "send_email",
+            "title": "Tool",
+            "type": "string"
+          },
+          "minimum": {
+            "default": 0,
+            "maximum": 8,
+            "minimum": 0,
+            "title": "Minimum",
+            "type": "integer"
+          },
+          "maximum": {
+            "default": 0,
+            "maximum": 8,
+            "minimum": 0,
+            "title": "Maximum",
+            "type": "integer"
+          }
+        },
+        "title": "EffectCountPredicate",
+        "type": "object"
+      },
+      "ErrorDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "ErrorDetail",
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "type": "object"
+      },
+      "EventType": {
+        "enum": [
+          "run_started",
+          "candidate_generated",
+          "case_started",
+          "source_injected",
+          "model_request",
+          "model_response",
+          "tool_proposed",
+          "policy_decision",
+          "tool_executed",
+          "tool_blocked",
+          "oracle_result",
+          "case_completed",
+          "run_completed",
+          "run_error",
+          "run_cancelled"
+        ],
+        "title": "EventType",
+        "type": "string"
+      },
+      "EventsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TraceEvent"
+            },
+            "maxItems": 500,
+            "title": "Items",
+            "type": "array"
+          },
+          "next_after_seq": {
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Next After Seq",
+            "type": "integer"
+          },
+          "has_more": {
+            "title": "Has More",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "items",
+          "next_after_seq",
+          "has_more"
+        ],
+        "title": "EventsResponse",
+        "type": "object"
+      },
+      "ExecutionMode": {
+        "enum": [
+          "live",
+          "fixture"
+        ],
+        "title": "ExecutionMode",
+        "type": "string"
+      },
+      "FinalContainsPredicate": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "final_contains",
+            "default": "final_contains",
+            "title": "Kind",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "values"
+        ],
+        "title": "FinalContainsPredicate",
+        "type": "object"
+      },
+      "FixtureSnapshot": {
+        "additionalProperties": false,
+        "properties": {
+          "fixture_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Fixture Id",
+            "type": "string"
+          },
+          "version": {
+            "default": 1,
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "documents": {
+            "items": {
+              "$ref": "#/components/schemas/DocumentRecord"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Documents",
+            "type": "array"
+          },
+          "customers": {
+            "items": {
+              "$ref": "#/components/schemas/CustomerRecord"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Customers",
+            "type": "array"
+          },
+          "outbox": {
+            "items": {
+              "$ref": "#/components/schemas/OutboxMessage"
+            },
+            "maxItems": 8,
+            "title": "Outbox",
+            "type": "array"
+          }
+        },
+        "required": [
+          "fixture_id",
+          "documents",
+          "customers"
+        ],
+        "title": "FixtureSnapshot",
+        "type": "object"
+      },
+      "Grant": {
+        "additionalProperties": false,
+        "properties": {
+          "principal_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Principal Id",
+            "type": "string"
+          },
+          "tenant_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Tenant Id",
+            "type": "string"
+          },
+          "allowed_customer_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_.:-]+$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Allowed Customer Ids",
+            "type": "array"
+          },
+          "allowed_tools": {
+            "items": {
+              "enum": [
+                "search_docs",
+                "get_customer",
+                "send_email"
+              ],
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Allowed Tools",
+            "type": "array"
+          },
+          "allowed_recipients": {
+            "items": {
+              "maxLength": 254,
+              "pattern": "^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\\.test$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Allowed Recipients",
+            "type": "array"
+          }
+        },
+        "required": [
+          "principal_id",
+          "tenant_id",
+          "allowed_customer_ids",
+          "allowed_tools",
+          "allowed_recipients"
+        ],
+        "title": "Grant",
+        "type": "object"
+      },
+      "HealthResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "live_ready": {
+            "title": "Live Ready",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "live_ready"
+        ],
+        "title": "HealthResponse",
+        "type": "object"
+      },
+      "JsonValue": {},
+      "ModelSettings": {
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Provider",
+            "type": "string"
+          },
+          "target_model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Target Model Id",
+            "type": "string"
+          },
+          "attacker_model_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Attacker Model Id",
+            "type": "string"
+          },
+          "temperature": {
+            "default": 0.0,
+            "maximum": 1,
+            "minimum": 0,
+            "title": "Temperature",
+            "type": "number"
+          },
+          "max_tokens": {
+            "default": 1024,
+            "maximum": 8192,
+            "minimum": 1,
+            "title": "Max Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "provider",
+          "target_model_id",
+          "attacker_model_id"
+        ],
+        "title": "ModelSettings",
+        "type": "object"
+      },
+      "OracleOutcome": {
+        "enum": [
+          "success",
+          "failure",
+          "inconclusive"
+        ],
+        "title": "OracleOutcome",
+        "type": "string"
+      },
+      "OutboxContainsPredicate": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "const": "outbox_contains",
+            "default": "outbox_contains",
+            "title": "Kind",
+            "type": "string"
+          },
+          "recipient": {
+            "maxLength": 254,
+            "pattern": "^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\\.test$",
+            "title": "Recipient",
+            "type": "string"
+          },
+          "subject_contains": {
+            "items": {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Subject Contains",
+            "type": "array"
+          },
+          "body_contains": {
+            "items": {
+              "maxLength": 500,
+              "minLength": 1,
+              "type": "string"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Body Contains",
+            "type": "array"
+          }
+        },
+        "required": [
+          "recipient",
+          "body_contains"
+        ],
+        "title": "OutboxContainsPredicate",
+        "type": "object"
+      },
+      "OutboxMessage": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "to": {
+            "maxLength": 254,
+            "pattern": "^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\\.test$",
+            "title": "To",
+            "type": "string"
+          },
+          "subject": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Subject",
+            "type": "string"
+          },
+          "body": {
+            "maxLength": 32000,
+            "title": "Body",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "to",
+          "subject",
+          "body"
+        ],
+        "title": "OutboxMessage",
+        "type": "object"
+      },
+      "ReplayBundle": {
+        "additionalProperties": false,
+        "properties": {
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "synthetic_data": {
+            "const": true,
+            "default": true,
+            "title": "Synthetic Data",
+            "type": "boolean"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunSummary"
+          },
+          "exported_at": {
+            "format": "date-time",
+            "title": "Exported At",
+            "type": "string"
+          },
+          "app_git_revision": {
+            "anyOf": [
+              {
+                "pattern": "^[0-9a-f]{7,40}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "App Git Revision"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/ReplayCase"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Cases",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/TraceEvent"
+            },
+            "maxItems": 10000,
+            "title": "Events",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run",
+          "exported_at",
+          "cases"
+        ],
+        "title": "ReplayBundle",
+        "type": "object"
+      },
+      "ReplayCase": {
+        "additionalProperties": false,
+        "properties": {
+          "spec": {
+            "$ref": "#/components/schemas/CaseSpec"
+          },
+          "result": {
+            "$ref": "#/components/schemas/CaseResult"
+          },
+          "fingerprints": {
+            "$ref": "#/components/schemas/ReplayFingerprints"
+          }
+        },
+        "required": [
+          "spec",
+          "result",
+          "fingerprints"
+        ],
+        "title": "ReplayCase",
+        "type": "object"
+      },
+      "ReplayFingerprints": {
+        "additionalProperties": false,
+        "properties": {
+          "fixture_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Fixture Sha256",
+            "type": "string"
+          },
+          "model_settings_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Model Settings Sha256",
+            "type": "string"
+          },
+          "policy_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Policy Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fixture_sha256",
+          "model_settings_sha256",
+          "policy_sha256"
+        ],
+        "title": "ReplayFingerprints",
+        "type": "object"
+      },
+      "RetestAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "title": "RetestAccepted",
+        "type": "object"
+      },
+      "RetestRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "defense": {
+            "const": "gateway",
+            "default": "gateway",
+            "title": "Defense",
+            "type": "string"
+          },
+          "include_benign": {
+            "default": true,
+            "title": "Include Benign",
+            "type": "boolean"
+          }
+        },
+        "title": "RetestRequest",
+        "type": "object"
+      },
+      "RunAccepted": {
+        "additionalProperties": false,
+        "properties": {
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "status": {
+            "const": "queued",
+            "default": "queued",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "title": "RunAccepted",
+        "type": "object"
+      },
+      "RunDetailResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/RunSummary"
+          },
+          "cases": {
+            "items": {
+              "$ref": "#/components/schemas/CaseResultPublic"
+            },
+            "maxItems": 100,
+            "title": "Cases",
+            "type": "array"
+          }
+        },
+        "required": [
+          "run",
+          "cases"
+        ],
+        "title": "RunDetailResponse",
+        "type": "object"
+      },
+      "RunProgress": {
+        "additionalProperties": false,
+        "properties": {
+          "scheduled": {
+            "default": 0,
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Scheduled",
+            "type": "integer"
+          },
+          "completed": {
+            "default": 0,
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Completed",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "phase": {
+            "default": "queued",
+            "enum": [
+              "queued",
+              "benign",
+              "attack",
+              "retest",
+              "done"
+            ],
+            "title": "Phase",
+            "type": "string"
+          }
+        },
+        "title": "RunProgress",
+        "type": "object"
+      },
+      "RunRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "scenario_ids": {
+            "items": {
+              "enum": [
+                "doc_exfil",
+                "email_bola"
+              ],
+              "type": "string"
+            },
+            "maxItems": 2,
+            "minItems": 1,
+            "title": "Scenario Ids",
+            "type": "array"
+          },
+          "operation": {
+            "default": "discover",
+            "enum": [
+              "discover",
+              "suite"
+            ],
+            "title": "Operation",
+            "type": "string"
+          },
+          "defense": {
+            "$ref": "#/components/schemas/DefensePreset",
+            "default": "baseline"
+          },
+          "execution_mode": {
+            "$ref": "#/components/schemas/ExecutionMode",
+            "default": "fixture"
+          },
+          "budget": {
+            "$ref": "#/components/schemas/Budget"
+          },
+          "seed": {
+            "default": 0,
+            "maximum": 4294967295,
+            "minimum": 0,
+            "title": "Seed",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "scenario_ids"
+        ],
+        "title": "RunRequest",
+        "type": "object"
+      },
+      "RunStatus": {
+        "enum": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "cancelled",
+          "interrupted"
+        ],
+        "title": "RunStatus",
+        "type": "string"
+      },
+      "RunSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RunStatus"
+          },
+          "request": {
+            "$ref": "#/components/schemas/RunRequest"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Completed At"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/RunProgress"
+          },
+          "metrics": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Metrics",
+            "type": "object"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ErrorDetail"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "source_run_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Source Run Id"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "request",
+          "created_at"
+        ],
+        "title": "RunSummary",
+        "type": "object"
+      },
+      "RunsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/RunSummary"
+            },
+            "maxItems": 100,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "RunsResponse",
+        "type": "object"
+      },
+      "ScenarioSpec": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "doc_exfil",
+              "email_bola"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "task_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "surface": {
+            "$ref": "#/components/schemas/Surface"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "legitimate_task": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Legitimate Task",
+            "type": "string"
+          },
+          "attack_goal": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Attack Goal",
+            "type": "string"
+          },
+          "fixture_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Fixture Id",
+            "type": "string"
+          },
+          "grant": {
+            "$ref": "#/components/schemas/Grant"
+          },
+          "expected_benign": {
+            "items": {
+              "discriminator": {
+                "mapping": {
+                  "effect_count": "#/components/schemas/EffectCountPredicate",
+                  "final_contains": "#/components/schemas/FinalContainsPredicate",
+                  "outbox_contains": "#/components/schemas/OutboxContainsPredicate"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/FinalContainsPredicate"
+                },
+                {
+                  "$ref": "#/components/schemas/OutboxContainsPredicate"
+                },
+                {
+                  "$ref": "#/components/schemas/EffectCountPredicate"
+                }
+              ]
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Expected Benign",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "task_id",
+          "version",
+          "title",
+          "surface",
+          "source_id",
+          "legitimate_task",
+          "attack_goal",
+          "fixture_id",
+          "grant",
+          "expected_benign"
+        ],
+        "title": "ScenarioSpec",
+        "type": "object"
+      },
+      "ScenarioSpecPublic": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "doc_exfil",
+              "email_bola"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "task_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Task Id",
+            "type": "string"
+          },
+          "version": {
+            "maximum": 10000,
+            "minimum": 1,
+            "title": "Version",
+            "type": "integer"
+          },
+          "title": {
+            "maxLength": 500,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          },
+          "surface": {
+            "$ref": "#/components/schemas/Surface"
+          },
+          "source_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9_.:-]+$",
+            "title": "Source Id",
+            "type": "string"
+          },
+          "legitimate_task": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Legitimate Task",
+            "type": "string"
+          },
+          "attack_goal": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Attack Goal",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "task_id",
+          "version",
+          "title",
+          "surface",
+          "source_id",
+          "legitimate_task",
+          "attack_goal"
+        ],
+        "title": "ScenarioSpecPublic",
+        "type": "object"
+      },
+      "ScenariosResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioSpecPublic"
+            },
+            "maxItems": 2,
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ScenariosResponse",
+        "type": "object"
+      },
+      "StateDiff": {
+        "additionalProperties": false,
+        "properties": {
+          "returned_customer_ids": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_.:-]+$",
+              "type": "string"
+            },
+            "maxItems": 8,
+            "title": "Returned Customer Ids",
+            "type": "array"
+          },
+          "disclosed_fields": {
+            "items": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[a-zA-Z0-9_.:-]+$",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Disclosed Fields",
+            "type": "array"
+          },
+          "outbox_added": {
+            "items": {
+              "$ref": "#/components/schemas/OutboxMessage"
+            },
+            "maxItems": 8,
+            "title": "Outbox Added",
+            "type": "array"
+          }
+        },
+        "title": "StateDiff",
+        "type": "object"
+      },
+      "Surface": {
+        "enum": [
+          "document",
+          "email"
+        ],
+        "title": "Surface",
+        "type": "string"
+      },
+      "ToolCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "proposed": {
+            "default": 0,
+            "maximum": 8,
+            "minimum": 0,
+            "title": "Proposed",
+            "type": "integer"
+          },
+          "denied": {
+            "default": 0,
+            "maximum": 8,
+            "minimum": 0,
+            "title": "Denied",
+            "type": "integer"
+          },
+          "forbidden_executed": {
+            "default": 0,
+            "maximum": 8,
+            "minimum": 0,
+            "title": "Forbidden Executed",
+            "type": "integer"
+          }
+        },
+        "title": "ToolCounts",
+        "type": "object"
+      },
+      "TraceEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "trial_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Trial Id"
+          },
+          "type": {
+            "$ref": "#/components/schemas/EventType"
+          },
+          "parent_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "title": "Parent Event Ids",
+            "type": "array"
+          },
+          "data": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Data",
+            "type": "object"
+          },
+          "schema_version": {
+            "const": 1,
+            "default": 1,
+            "title": "Schema Version",
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "run_id": {
+            "format": "uuid",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "seq": {
+            "maximum": 1000000000,
+            "minimum": 1,
+            "title": "Seq",
+            "type": "integer"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "title": "Timestamp",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "id",
+          "run_id",
+          "seq",
+          "timestamp"
+        ],
+        "title": "TraceEvent",
+        "type": "object"
+      },
+      "Usage": {
+        "additionalProperties": false,
+        "properties": {
+          "input_tokens": {
+            "default": 0,
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "output_tokens": {
+            "default": 0,
+            "maximum": 1000000000,
+            "minimum": 0,
+            "title": "Output Tokens",
+            "type": "integer"
+          }
+        },
+        "title": "Usage",
+        "type": "object"
+      },
+      "Violation": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "enum": [
+              "unauthorized_read",
+              "unauthorized_send",
+              "canary_leak"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "impact": {
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ],
+            "title": "Impact",
+            "type": "string"
+          },
+          "evidence_event_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Evidence Event Ids",
+            "type": "array"
+          },
+          "details": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Details",
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "impact",
+          "evidence_event_ids",
+          "details"
+        ],
+        "title": "Violation",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "demoBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Planned shared demo access token; never a provider API key."
+      }
+    }
+  }
+}

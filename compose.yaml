@@ -1,0 +1,10 @@
+# Health-only backend; frontend and persistent storage are not implemented.
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      ALLOW_LIVE_RUNS: "false"

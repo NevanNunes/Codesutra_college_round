@@ -1,0 +1,6 @@
+{
+  "schema_version": 1, "id": "00000000-0000-4000-8000-000000000004",
+  "run_id": "00000000-0000-4000-8000-000000000001", "trial_id": "00000000-0000-4000-8000-000000000002",
+  "seq": 1, "timestamp": "2026-10-10T12:00:00Z", "type": "oracle_result", "parent_event_ids": [],
+  "data": {"oracle_outcome": "failure", "benign_success": false, "note": "Illustrative contract fixture, not a live trace."}
+}

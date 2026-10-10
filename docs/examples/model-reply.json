@@ -1,0 +1,8 @@
+{
+  "content": [
+    {"type": "text", "text": "I will check the permitted customer."},
+    {"type": "tool_use", "call": {"call_id": "call_1", "name": "get_customer", "arguments": {"customer_id": "cust_a"}}}
+  ],
+  "usage": {"input_tokens": 120, "output_tokens": 30}, "stop_reason": "tool_use",
+  "model_id": "fixture-target", "provider_request_id": "fixture-request-1"
+}

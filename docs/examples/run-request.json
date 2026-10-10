@@ -1,0 +1,11 @@
+{
+  "scenario_ids": ["doc_exfil", "email_bola"],
+  "operation": "discover",
+  "defense": "baseline",
+  "execution_mode": "fixture",
+  "budget": {
+    "max_candidates": 6, "max_model_turns": 6, "max_tool_calls": 8,
+    "case_timeout_s": 60, "run_timeout_s": 300, "max_total_tokens": 60000
+  },
+  "seed": 42
+}
