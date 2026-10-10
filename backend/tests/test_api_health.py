@@ -1,4 +1,4 @@
-"""Transport checks for the implemented health-only application."""
+"""Transport and error sanitization checks for the AgentBreak application."""
 
 import pytest
 from fastapi import HTTPException
@@ -32,10 +32,9 @@ def test_health_is_not_live_ready(monkeypatch, configured):
 
 @pytest.mark.parametrize(
     "method,path",
-    [("GET", "/missing/synthetic-secret"), ("GET", "/api/scenarios"),
-     ("GET", "/api/runs"), ("POST", "/api/runs")],
+    [("GET", "/missing/synthetic-secret"), ("GET", "/api/missing")],
 )
-def test_unimplemented_routes_are_sanitized_404(method, path):
+def test_missing_routes_are_sanitized_404(method, path):
     with TestClient(create_app()) as client:
         response = client.request(method, path)
     assert response.status_code == 404
@@ -44,11 +43,17 @@ def test_unimplemented_routes_are_sanitized_404(method, path):
     }
 
 
-def test_only_health_is_registered():
-    app = create_app()
-    assert [(route.path, route.methods) for route in app.routes] == [
-        ("/api/health", {"GET"})
-    ]
+def test_routes_are_registered():
+    from agentbreak.api.routes import router
+    paths = {f"/api{r.path}" for r in router.routes}
+    assert "/api/health" in paths
+    assert "/api/scenarios" in paths
+    assert "/api/runs" in paths
+    assert "/api/runs/{id}" in paths
+    assert "/api/runs/{id}/events" in paths
+    assert "/api/runs/{id}/retest" in paths
+    assert "/api/runs/{id}/cancel" in paths
+    assert "/api/runs/{id}/export" in paths
 
 
 def test_wrong_method_is_sanitized():
@@ -64,8 +69,6 @@ def test_wrong_method_is_sanitized():
 def test_validation_handler_does_not_echo_input():
     app = create_app()
 
-    # Exercise the installed handler through a test-only route. Production has
-    # no request-bearing business endpoints at this stage.
     @app.get("/_test/validate")
     async def validate(count: int):
         return {"count": count}

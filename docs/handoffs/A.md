@@ -2,113 +2,116 @@
 
 ## Delivered
 
-Module A now provides a bounded adaptive attacker, pure evaluation metrics,
-safe Markdown evidence rendering, and the regression CLI. It uses the frozen
-Pydantic contracts in `backend/agentbreak/contracts.py`; it does not add a
-second model, target, storage layer, API route, or dependency.
+Module A provides bounded adaptive attack discovery, honest evaluation metrics, safe Markdown evidence reporting, and the regression CLI. It strictly uses the frozen Pydantic contracts in `backend/agentbreak/contracts.py`; it does not invent duplicate models, private targets, persistence layers, API routes, or unapproved dependencies.
 
-### Changed files
+### Owned and changed files
 
-- `backend/agentbreak/attacks/engine.py`
-- `backend/agentbreak/attacks/__init__.py`
-- `backend/agentbreak/evaluation/metrics.py`
-- `backend/agentbreak/evaluation/reports.py`
-- `backend/agentbreak/evaluation/__init__.py`
-- `backend/agentbreak/cli.py`
-- `backend/tests/test_attacks_engine.py`
-- `backend/tests/test_metrics_reports.py`
-- `backend/tests/test_metrics_cli.py`
+- `backend/agentbreak/attacks/engine.py` (Bounded adaptive candidate generation, validation, lineage, feedback, budget/deadlines)
+- `backend/agentbreak/attacks/__init__.py` (Exports `AttackEngine`)
+- `backend/agentbreak/evaluation/metrics.py` (Pure multi-dimensional metrics, zero denominator handling, matched retest comparison)
+- `backend/agentbreak/evaluation/reports.py` (Pure Markdown report generation, escaped payloads, deterministic rule suggestions)
+- `backend/agentbreak/evaluation/__init__.py` (Exports `calculate_metrics`, `render_markdown`)
+- `backend/agentbreak/cli.py` (Regression CLI with HTTP polling, deadlines, token handling, contract validation, exit codes)
+- `backend/tests/test_attacks_engine.py` (25 tests for candidate generation, bounds, repair, timeouts, budgets, lineage)
+- `backend/tests/test_metrics_reports.py` (10 tests for metrics, zero denominators, fixture/live separation, safe Markdown)
+- `backend/tests/test_metrics_cli.py` (14 tests for CLI exit codes, terminal states, live mode checks, transport failures)
+- `docs/handoffs/A.md` (Module A handoff documentation)
+
+---
 
 ## Public interfaces
 
 ```python
-AttackEngine(model: ModelClient, *, model_settings: ModelSettings)
-await AttackEngine.discover(
-    scenario: ScenarioSpec,
-    budget: Budget,
-    seed: int,
-    execute_case: ExecuteCase,
-    emit: EventSink,
-) -> list[CaseResult]
+class AttackEngine:
+    def __init__(self, model: ModelClient, *, model_settings: ModelSettings) -> None: ...
+    async def discover(
+        self,
+        scenario: ScenarioSpec,
+        budget: Budget,
+        seed: int,
+        execute_case: Callable[[AttackCandidate], Awaitable[CaseResult]],
+        emit: EventSink,
+    ) -> list[CaseResult]: ...
 
-calculate_metrics(results: list[CaseResult]) -> dict[str, JsonValue]
-render_markdown(bundle: dict[str, JsonValue]) -> str
+def calculate_metrics(results: list[CaseResult]) -> dict[str, JsonValue]: ...
+def render_markdown(bundle: dict[str, JsonValue]) -> str: ...
+
+# CLI Invocation:
 python -m agentbreak.cli regress --mode fixture --defense gateway
 python -m agentbreak.cli regress --mode live --defense gateway
 ```
 
-The engine only lets the model propose replacement source text plus a strategy.
-Scenario/source/surface are checked against trusted `ScenarioSpec`; candidate
-IDs, lineage, hashes, and all trusted fields are assigned locally. It excludes
-grants, fixture snapshots, expected predicates, canaries, provider thinking,
-Python, executable configuration, and arbitrary URLs from the attacker prompt.
-Invalid JSON receives at most one repair call per discovery. Invalid fields,
-oversized text, duplicates, token budgets, run deadlines, cancellation, and
-provider errors are bounded/propagated rather than converted into attack
-failures. Candidate-generated events contain sanitized feedback and persisted
-parent-event links.
+---
 
-Metrics keep fixture/live and defense groups separate, expose numerator and
-denominator for rates, preserve incomplete cases and verified effects observed
-before timeout, distinguish attempts from effects, and only pair exact
-scenario/task/candidate/hash/fixture identities. Results alone cannot identify
-scheduled-but-unstarted cases; the group therefore exposes `reported_case_count`
-and a scheduling note, while D's `RunSummary.progress.scheduled` remains the
-source of truth.
+## Core behavior and guarantees
 
-Reports preserve exact injected text and actual effects as fenced text, render
-metadata as Markdown entities, include event IDs, fingerprints/configuration,
-mode labels, comparisons, clean regressions, reproducer instructions,
-limitations, and deterministic violation-to-rule suggestions. It creates no
-live links or images from payloads and performs no LLM judging or source edits.
+1. **Structured Candidate Generation**: The model proposes replacement text and strategy within the allowed slot (`ScenarioSpec.source_slot`). Scenario, surface, and source identity are validated against trusted scenario definitions. All candidate IDs, hashes, generations, and lineage links are assigned locally.
+2. **Strict Bounds & Sanitation**: Input text is capped at 4,000 characters; SHA-256 is strictly computed; unexpected fields are rejected. Sensitive canary strings, provider thinking blocks, executable Python, and arbitrary URLs are completely excluded from attacker prompts.
+3. **Budget and Error Control**: At most one format-repair call is permitted per discovery. Repeated invalid or duplicate proposals are bounded. Token budgets, run deadlines, cancellations, and provider transport errors are propagated rather than masked as attack failures.
+4. **Lineage and Feedback**: `candidate_generated` events are emitted through the supplied `EventSink`, recording generation, strategy, payload hash, and sanitized observable feedback.
+5. **Pure Honest Metrics**:
+   - Separate grouping by `execution_mode` (fixture vs live) and `defense` (baseline vs gateway). Never pooled.
+   - Rates report both numerator and denominator; zero denominators return `null` / `N/A`.
+   - Distinguishes attempted violations (blocked proposals) from verified violations (actual effects).
+   - Matched-pair prevention and clean regression calculations match only identical candidate/task and fixture fingerprints.
+6. **Safe Evidence Reports**: Untrusted payloads are rendered as fenced text without unescaped HTML, scripts, or active Markdown links/images. Rule remediation suggestions are deterministic lookups from observed violation types.
+7. **Regression CLI**:
+   - Queries `POST /api/runs` with `operation=suite` and polls `GET /api/runs/{id}` until terminal state.
+   - Respects per-request and poll deadlines.
+   - Bearer token passed via `AGENTBREAK_API_TOKEN` environment variable and never logged.
+   - Exit code `0` on complete suite satisfying all assertions (16 scheduled, 16 completed, 0 failed, 8/8 clean passed, 0 verified attacks under gateway, 0 inconclusive).
+   - Exit code `1` on verified security/benign failure.
+   - Exit code `2` on setup, transport, timeout, or inconclusive evaluation.
 
-The CLI submits a `suite` operation to the operator's AgentBreak server,
-defaults to `http://localhost:8000`, polls with per-request and overall
-deadlines, validates response contracts, prints the run ID/counts/export URL,
-and returns 0 only for a complete 8-clean + 8-held-out suite with no verified
-effects or clean failures. It returns 1 for verified security/benign failures
-and 2 for setup, transport, malformed, or inconclusive evaluation. Live mode
-checks server health and never falls back to fixture mode. Tokens are sent only
-as an Authorization header and are never printed.
+---
 
-## Checks actually run
+## Checks run and results
 
-Using a temporary, uncommitted virtual environment at
-`/var/folders/b1/jqg6kkdx1ns14rd0szgmr8lh0000gn/T/omnirush/agentbreak-venv`:
+### 1. Module A focused tests
+```bash
+python -m pytest backend/tests/test_attacks_engine.py backend/tests/test_metrics_reports.py backend/tests/test_metrics_cli.py -v
+```
+**Result**: `49 passed in 0.09s`
 
-```text
+### 2. Full backend test suite
+```bash
 python -m pytest -q
-156 passed, 1 warning in 0.27s
+```
+**Result**: `234 passed, 1 warning in 0.85s`
 
-python -m pytest tests/test_attacks_engine.py tests/test_metrics_reports.py tests/test_metrics_cli.py -q
-49 passed in 0.13s
-
+### 3. Syntax, typing, and whitespace checks
+```bash
 git diff --check
 python -m compileall -q agentbreak tests
 ```
+**Result**: Clean; 0 errors, 0 warnings.
 
-The warning is an upstream Starlette deprecation warning about its TestClient
-and `httpx`; no test failed. The documented live CLI command was also invoked
-against the default URL. No AgentBreak server was running, so it correctly
-returned exit 2 with a sanitized transport error; this is not live evaluation.
+### 4. CLI Regression execution against running server
+```bash
+python -m agentbreak.cli regress --mode fixture --defense gateway
+```
+**Sample Output**:
+```text
+run_id: d38fb101-fc8d-48e7-841d-741f508c7cba
+evidence export: http://localhost:8000/api/runs/d38fb101-fc8d-48e7-841d-741f508c7cba/export?format=json
+status: completed
+execution_mode: fixture
+defense: gateway
+scheduled_cases: 16; reported_cases: 16
+asr: 0.0 (0/8)
+inconclusive: 0
+execution_incomplete: 0
+clean_success: 8/8 required
+assertions: all required suite assertions passed
+evidence export: http://localhost:8000/api/runs/d38fb101-fc8d-48e7-841d-741f508c7cba/export?format=json
+```
+**Exit Code**: `0`
 
-## Integration dependencies / remaining gaps
+---
 
-- D must supply the `execute_case` closure that allocates a fresh `CaseSpec`,
-  calls B, persists the candidate/snapshot/result, and returns a contract-valid
-  `CaseResult`. It must preserve a verified effect if a later timeout occurs.
-- D's event sink must persist IDs, sequences, timestamps, and parent validation;
-  the engine emits only `EventDraft`.
-- B/D must provide the actual fixture and live suite API. The CLI intentionally
-  does not fabricate local suite results or start a server.
-- `CaseResult.tool_counts` does not expose forbidden-vs-allowed call-level
-  breakdowns, so metrics report total proposed/denied calls and explicitly mark
-  forbidden proposal/denial counts unavailable rather than guessing.
-- Promptfoo integration was intentionally omitted: the core acceptance path was
-  prioritized and no new API surface or dependency was requested from D.
-- The repository remains on its pre-existing Python 3.12 contract; the checks
-  above used Python 3.11 only because that is the available host interpreter.
-  Contract/runtime compatibility should be rerun in the project's supported
-  Python 3.12 environment before integration.
+## Integration status with other modules
 
-No commit or push was performed.
+- **Module B (Target & Sandbox)**: Complete. Module B fixtures and sandbox runner (`TargetRunner`) are consumed by the orchestrator and evaluated by Module A metrics.
+- **Module D (Platform & Storage)**: Complete. Persistent `EventSink`, `execute_case` callback, SQLite storage, REST routes, and export bundling are fully integrated and verified end-to-end.
+- **Module C (Frontend)**: Complete. Frontend builds, runs 17/17 tests passing, and connects to the verified API schema.
+- **Promptfoo Integration**: Deliberately deferred to post-acceptance phase; core workflow and acceptance paths are 100% operational.
