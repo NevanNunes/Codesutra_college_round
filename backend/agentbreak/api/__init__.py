@@ -1,1 +1,5 @@
-"""Pending session D: run API; the sole health route currently lives in main."""
+"""AgentBreak API package."""
+
+from agentbreak.api.routes import router
+
+__all__ = ["router"]

@@ -1,4 +1,3 @@
-# Health-only backend; frontend and persistent storage are not implemented.
 services:
   api:
     build:
@@ -8,3 +7,10 @@ services:
       - "127.0.0.1:8000:8000"
     environment:
       ALLOW_LIVE_RUNS: "false"
+      AGENTBREAK_DB_PATH: "/data/agentbreak.db"
+      FRONTEND_DIST: "/app/frontend/dist"
+    volumes:
+      - agentbreak-data:/data
+
+volumes:
+  agentbreak-data:

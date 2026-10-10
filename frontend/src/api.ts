@@ -78,7 +78,7 @@ export const api = {
     try {
       return await request('/health');
     } catch {
-      return { status: 'ok', version: '1.0.0', live_ready: false, schema_version: '1' };
+      return { status: 'ok', live_ready: false, schema_version: 1 };
     }
   },
 
@@ -102,7 +102,7 @@ export const api = {
     try {
       return await request(`/runs?limit=${limit}`);
     } catch {
-      return { items: [FIXTURE_RUN_DETAIL.run], total: 1, has_more: false };
+      return { items: [FIXTURE_RUN_DETAIL.run] };
     }
   },
 
@@ -126,7 +126,7 @@ export const api = {
     try {
       return await request(`/runs/${id}/retest`, { method: 'POST', body: JSON.stringify(body) });
     } catch {
-      return { run_id: 'retest-mock-run-id', status: 'queued' };
+      return { run_id: 'retest-mock-run-id' };
     }
   },
 
@@ -134,7 +134,7 @@ export const api = {
     try {
       return await request(`/runs/${id}/cancel`, { method: 'POST' });
     } catch {
-      return { id, status: 'cancelled' };
+      return { run_id: id, status: 'cancelled' };
     }
   },
 
