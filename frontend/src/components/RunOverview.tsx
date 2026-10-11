@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { api, ApiError } from '../api';
 import { StatusBadge } from './Badges';
 import type { RunSummary } from '../types';
-import { TERMINAL_STATUSES } from '../types';
+import { TERMINAL_STATUSES, formatErrorDetail } from '../types';
 
 interface RunOverviewProps {
   run: RunSummary;
@@ -175,7 +175,7 @@ export function RunOverview({ run, onCancelled, onRetest, onExport }: RunOvervie
 
       {run.error && (
         <div className="callout danger mt-16" role="alert">
-          <span>✕</span> <span>Run error: {run.error}</span>
+          <span>✕</span> <span>Run error: {formatErrorDetail(run.error)}</span>
         </div>
       )}
     </div>

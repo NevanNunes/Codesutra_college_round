@@ -6,8 +6,9 @@ import { OracleBadge, StatusBadge, SimulationBanner } from '../components/Badges
 import { CaseEvidence } from '../components/CaseEvidence';
 import { CaseList } from '../components/CaseList';
 import { Comparison } from '../components/Comparison';
+import { RunOverview } from '../components/RunOverview';
 import { FIXTURE_RUN_DETAIL, FIXTURE_EVENTS } from '../fixtures';
-import type { CaseResultPublic, TraceEvent } from '../types';
+import type { CaseResultPublic, TraceEvent, RunSummary } from '../types';
 
 // ─── Oracle semantics ────────────────────────────────────────────────────────
 describe('OracleBadge semantics', () => {
@@ -105,7 +106,7 @@ describe('CaseList', () => {
   });
 
   it('distinguishes attack from benign type labels', () => {
-    const benignCase: CaseResultPublic = { ...cases[0], candidate_id: null, payload_sha256: null };
+    const benignCase: CaseResultPublic = { ...cases[0], trial_id: '00000000-0000-4000-8000-000000000099', candidate_id: null, payload_sha256: null };
     render(<CaseList cases={[cases[0], benignCase]} onSelectCase={vi.fn()} selectedTrialId={null} />);
     // The tab filter also has "Attack" — use getAllByText
     expect(screen.getAllByText('Attack').length).toBeGreaterThan(0);
@@ -174,5 +175,63 @@ describe('Event deduplication', () => {
     const sorted = [...events].sort((a, b) => a.seq - b.seq);
     expect(sorted[0].seq).toBe(2);
     expect(sorted[1].seq).toBe(5);
+  });
+});
+
+// ─── Error rendering with ErrorDetail objects vs strings ─────────────────────
+describe('Error rendering (ErrorDetail object support)', () => {
+  it('renders RunOverview cleanly when error is an ErrorDetail object without React child crash', () => {
+    const runWithObjectError: RunSummary = {
+      ...FIXTURE_RUN_DETAIL.run,
+      status: 'failed',
+      error: {
+        code: 'EXECUTION_TIMEOUT',
+        message: 'Case execution timed out after 60s',
+      },
+    };
+
+    render(
+      <RunOverview
+        run={runWithObjectError}
+        onCancelled={vi.fn()}
+        onRetest={vi.fn()}
+        onExport={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/EXECUTION_TIMEOUT: Case execution timed out after 60s/);
+  });
+
+  it('renders RunOverview cleanly when error is a string', () => {
+    const runWithStringError: RunSummary = {
+      ...FIXTURE_RUN_DETAIL.run,
+      status: 'failed',
+      error: 'Uncaught network failure',
+    };
+
+    render(
+      <RunOverview
+        run={runWithStringError}
+        onCancelled={vi.fn()}
+        onRetest={vi.fn()}
+        onExport={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/Run error: Uncaught network failure/);
+  });
+
+  it('renders CaseEvidence cleanly when case error is an ErrorDetail object', () => {
+    const caseWithObjectError: CaseResultPublic = {
+      ...FIXTURE_RUN_DETAIL.cases[0],
+      status: 'failed',
+      error: {
+        code: 'SANDBOX_VIOLATION',
+        message: 'Forbidden syscall intercepted',
+      },
+    };
+
+    render(<CaseEvidence caseResult={caseWithObjectError} onClose={vi.fn()} />);
+    expect(screen.getByText(/SANDBOX_VIOLATION: Forbidden syscall intercepted/)).toBeInTheDocument();
   });
 });

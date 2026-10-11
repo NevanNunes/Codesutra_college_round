@@ -1,5 +1,6 @@
 import { OracleBadge, StatusBadge } from './Badges';
 import type { CaseResultPublic } from '../types';
+import { formatErrorDetail } from '../types';
 
 interface CaseEvidenceProps {
   caseResult: CaseResultPublic;
@@ -186,7 +187,7 @@ export function CaseEvidence({ caseResult: c, onClose }: CaseEvidenceProps) {
 
           {c.error && (
             <div className="callout danger">
-              <span>✕</span> Case error: {c.error}
+              <span>✕</span> Case error: {formatErrorDetail(c.error)}
             </div>
           )}
         </div>
