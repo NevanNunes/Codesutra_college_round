@@ -78,7 +78,7 @@ export const api = {
     try {
       return await request('/health');
     } catch {
-      return FIXTURE_HEALTH;
+      return { status: 'ok', live_ready: false, schema_version: 1 };
     }
   },
 

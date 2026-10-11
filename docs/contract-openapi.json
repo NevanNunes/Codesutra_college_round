@@ -1507,12 +1507,14 @@
           "kind": {
             "const": "effect_count",
             "default": "effect_count",
-            "title": "Kind"
+            "title": "Kind",
+            "type": "string"
           },
           "tool": {
             "const": "send_email",
             "default": "send_email",
-            "title": "Tool"
+            "title": "Tool",
+            "type": "string"
           },
           "minimum": {
             "default": 0,
@@ -1634,7 +1636,8 @@
           "kind": {
             "const": "final_contains",
             "default": "final_contains",
-            "title": "Kind"
+            "title": "Kind",
+            "type": "string"
           },
           "values": {
             "items": {
@@ -1810,12 +1813,14 @@
           "status": {
             "const": "ok",
             "default": "ok",
-            "title": "Status"
+            "title": "Status",
+            "type": "string"
           },
           "schema_version": {
             "const": 1,
             "default": 1,
-            "title": "Schema Version"
+            "title": "Schema Version",
+            "type": "integer"
           },
           "live_ready": {
             "title": "Live Ready",
@@ -1855,8 +1860,8 @@
           },
           "temperature": {
             "default": 0.0,
-            "maximum": 1.0,
-            "minimum": 0.0,
+            "maximum": 1,
+            "minimum": 0,
             "title": "Temperature",
             "type": "number"
           },
@@ -1891,7 +1896,8 @@
           "kind": {
             "const": "outbox_contains",
             "default": "outbox_contains",
-            "title": "Kind"
+            "title": "Kind",
+            "type": "string"
           },
           "recipient": {
             "maxLength": 254,
@@ -1969,12 +1975,14 @@
           "schema_version": {
             "const": 1,
             "default": 1,
-            "title": "Schema Version"
+            "title": "Schema Version",
+            "type": "integer"
           },
           "synthetic_data": {
             "const": true,
             "default": true,
-            "title": "Synthetic Data"
+            "title": "Synthetic Data",
+            "type": "boolean"
           },
           "run": {
             "$ref": "#/components/schemas/RunSummary"
@@ -2092,7 +2100,8 @@
           "defense": {
             "const": "gateway",
             "default": "gateway",
-            "title": "Defense"
+            "title": "Defense",
+            "type": "string"
           },
           "include_benign": {
             "default": true,
@@ -2114,7 +2123,8 @@
           "status": {
             "const": "queued",
             "default": "queued",
-            "title": "Status"
+            "title": "Status",
+            "type": "string"
           }
         },
         "required": [
@@ -2211,19 +2221,11 @@
             "type": "string"
           },
           "defense": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/DefensePreset"
-              }
-            ],
+            "$ref": "#/components/schemas/DefensePreset",
             "default": "baseline"
           },
           "execution_mode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ExecutionMode"
-              }
-            ],
+            "$ref": "#/components/schemas/ExecutionMode",
             "default": "fixture"
           },
           "budget": {
@@ -2650,7 +2652,8 @@
           "schema_version": {
             "const": 1,
             "default": 1,
-            "title": "Schema Version"
+            "title": "Schema Version",
+            "type": "integer"
           },
           "id": {
             "format": "uuid",

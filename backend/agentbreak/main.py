@@ -298,7 +298,7 @@ async def _execute_run(app: FastAPI, run_id: UUID, run: RunSummary, cancel_event
             spec = CaseSpec(
                 run_id=run_id, trial_id=trial_id, scenario=scenario,
                 candidate=seed.candidate, defense=req.defense, execution_mode=req.execution_mode,
-                fixture_snapshot=injected_snapshot, budget=req.budget, seed=req.seed,
+                fixture_snapshot=snapshot, budget=req.budget, seed=req.seed,
                 model_settings=model_settings, policy_version=policy_version,
             )
             db.save_case_spec(run_id, spec)
@@ -315,9 +315,9 @@ async def _execute_run(app: FastAPI, run_id: UUID, run: RunSummary, cancel_event
                 }
             ))
 
+            case_client = _get_case_client(app, req, spec)
+            runner = TargetRunner(case_client)
             try:
-                case_client = _get_case_client(app, req, spec)
-                runner = TargetRunner(case_client)
                 result = await asyncio.wait_for(
                     runner.run_case(spec, emit),
                     timeout=req.budget.case_timeout_s,
@@ -489,6 +489,12 @@ def _get_case_client(app: FastAPI, req: RunRequest, spec: CaseSpec):
             if t.scenario_id == spec.scenario.id and t.task_id == spec.scenario.task_id
         ]
         if not matching:
+            from agentbreak.fixtures.data import BENIGN_SCENARIOS
+            known_tasks = {s["task_id"] for s in BENIGN_SCENARIOS if s.get("id") == spec.scenario.id}
+            if spec.scenario.task_id in known_tasks:
+                matching = [t for t in traces if t.scenario_id == spec.scenario.id]
+
+        if not matching:
             raise FixtureTraceNotFoundError(
                 f"No fixture trace found for scenario '{spec.scenario.id}' and task '{spec.scenario.task_id}'."
             )
@@ -614,6 +620,48 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         pass
 
 
+def _mount_frontend(app: FastAPI) -> None:
+    """Serve built frontend static assets and SPA fallback if available."""
+    static_dir = os.environ.get("STATIC_DIR", "").strip()
+    static_path: Path | None = None
+
+    if static_dir:
+        p = Path(static_dir)
+        if p.is_dir() and (p / "index.html").is_file():
+            static_path = p
+    else:
+        candidates = [
+            Path("/app/frontend/dist"),
+            Path(__file__).resolve().parents[2] / "frontend" / "dist",
+        ]
+        for c in candidates:
+            if c.is_dir() and (c / "index.html").is_file():
+                static_path = c
+                break
+
+    if static_path is None:
+        return
+
+    from fastapi.responses import FileResponse
+    from fastapi.staticfiles import StaticFiles
+
+    assets_dir = static_path / "assets"
+    if assets_dir.is_dir():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+    index_html = static_path / "index.html"
+
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str) -> Any:
+        # Preserve /api 404/errors before SPA fallback
+        if full_path.startswith("api"):
+            return _error_response(404, "not_found", "Resource not found.")
+        file_path = static_path / full_path
+        if full_path and file_path.is_file():
+            return FileResponse(file_path)
+        return FileResponse(index_html)
+
+
 def create_app() -> FastAPI:
     """Construct the full AgentBreak application."""
     app = FastAPI(
@@ -663,6 +711,9 @@ def create_app() -> FastAPI:
     
     from agentbreak.api.report_routes import report_router
     app.include_router(report_router)
+
+    # Mount static assets & SPA fallback
+    _mount_frontend(app)
 
     return app
 

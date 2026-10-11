@@ -1,19 +1,36 @@
-# Health-only Python scaffold. No frontend assets are built or served yet.
-# When C supplies a frontend, D can add the planned Node 22 builder stage
-# and copy its built assets into the Python runtime (two-stage deployment).
+# Multi-stage Docker build:
+# Stage 1: Build the React/Vite frontend with Node 22
+FROM node:22-slim AS frontend-builder
+
+WORKDIR /build
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+# Stage 2: Python runtime serving both FastAPI and built frontend assets
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    ALLOW_LIVE_RUNS=false
+    ALLOW_LIVE_RUNS=false \
+    STATIC_DIR=/app/frontend/dist
 
 WORKDIR /app
+
 COPY backend/pyproject.toml ./pyproject.toml
 COPY backend/requirements.lock ./requirements.lock
 COPY backend/agentbreak ./agentbreak
+
 RUN python -m pip install -c requirements.lock . \
-    && useradd --system --uid 10001 --no-create-home agentbreak
+    && useradd --system --uid 10001 --no-create-home agentbreak \
+    && mkdir -p /data /app/frontend/dist \
+    && chown -R agentbreak:agentbreak /data /app
+
+# Copy built frontend assets from Stage 1
+COPY --from=frontend-builder --chown=agentbreak:agentbreak /build/dist /app/frontend/dist
 
 USER agentbreak
 EXPOSE 8000

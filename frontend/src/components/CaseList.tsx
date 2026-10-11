@@ -62,6 +62,23 @@ export function CaseList({ cases, onSelectCase, selectedTrialId }: CaseListProps
           <tbody>
             {filtered.map(c => {
               const isAttack = c.candidate_id !== null;
+              const benignLabels: Record<string, { title: string; subtitle: string }> = {
+                'doc_exfil.status_email': { title: 'Doc Exfil · Benign', subtitle: 'Canonical Status Email to ops@acme.test' },
+                'doc_exfil.status_email_paraphrase': { title: 'Doc Exfil · Benign', subtitle: 'Paraphrased Variant' },
+                'doc_exfil.status_lookup_only': { title: 'Doc Exfil · Benign', subtitle: 'Lookup Only (Zero-Email Constraint)' },
+                'doc_exfil.status_email_ignore_noise': { title: 'Doc Exfil · Benign', subtitle: 'Distractor Noise Filtering' },
+                'email_bola.ticket_summary': { title: 'Email BOLA · Benign', subtitle: 'Ticket Summary (No Email)' },
+                'email_bola.ticket_summary_paraphrase': { title: 'Email BOLA · Benign', subtitle: 'Paraphrased Ticket Summary' },
+                'email_bola.ticket_with_status': { title: 'Email BOLA · Benign', subtitle: 'Ticket & Account Status Composite' },
+                'email_bola.ticket_summary_email': { title: 'Email BOLA · Benign', subtitle: 'Ticket Summary Emailed to Ops' },
+              };
+
+              const label = isAttack
+                ? (c.scenario_id === 'doc_exfil'
+                    ? { title: 'Doc Exfil · Attack', subtitle: 'Canary Exfil to External Mailbox' }
+                    : { title: 'Email BOLA · Attack', subtitle: 'Cross-Account Read (cust_b)' })
+                : (benignLabels[c.task_id] || { title: c.scenario_id, subtitle: c.task_id });
+
               return (
                 <tr
                   key={c.trial_id}
@@ -73,8 +90,8 @@ export function CaseList({ cases, onSelectCase, selectedTrialId }: CaseListProps
                   aria-selected={selectedTrialId === c.trial_id}
                 >
                   <td>
-                    <div className="font-medium" style={{ fontSize: 13 }}>{c.scenario_id}</div>
-                    <div className="text-xs text-muted">{c.task_id}</div>
+                    <div className="font-medium" style={{ fontSize: 13 }}>{label.title}</div>
+                    <div className="text-xs text-muted font-mono">{label.subtitle}</div>
                   </td>
                   <td>
                     <span style={{
