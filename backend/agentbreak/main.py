@@ -205,9 +205,9 @@ async def _execute_run(app: FastAPI, run_id: UUID, run: RunSummary, cancel_event
         )
         db.save_case_spec(run_id, spec)
 
-        case_client = _get_case_client(app, req, spec)
-        runner = TargetRunner(case_client)
         try:
+            case_client = _get_case_client(app, req, spec)
+            runner = TargetRunner(case_client)
             result = await asyncio.wait_for(
                 runner.run_case(spec, emit),
                 timeout=req.budget.case_timeout_s,
@@ -406,6 +406,10 @@ async def _execute_retest(app: FastAPI, run_id: UUID, run: RunSummary, config: d
         trial_id = uuid4()
         # Fresh snapshot, same fixture
         snapshot = load_snapshot(orig_spec.scenario.fixture_id)
+        if orig_spec.candidate is not None:
+            for doc in snapshot.documents:
+                if doc.id == orig_spec.scenario.source_id:
+                    doc.body = orig_spec.candidate.text
 
         new_spec = CaseSpec(
             run_id=run_id, trial_id=trial_id, scenario=orig_spec.scenario,
@@ -416,9 +420,9 @@ async def _execute_retest(app: FastAPI, run_id: UUID, run: RunSummary, config: d
         )
         db.save_case_spec(run_id, new_spec)
 
-        case_client = _get_case_client(app, req, new_spec)
-        runner = TargetRunner(case_client)
         try:
+            case_client = _get_case_client(app, req, new_spec)
+            runner = TargetRunner(case_client)
             result = await asyncio.wait_for(
                 runner.run_case(new_spec, emit),
                 timeout=req.budget.case_timeout_s,
@@ -512,7 +516,7 @@ def _get_case_client(app: FastAPI, req: RunRequest, spec: CaseSpec):
             return FixtureModelClient(matching[0])
         else:
             attack_trace = next(
-                (t for t in matching if t.name.endswith("_insecure_failure") or "insecure" in t.name or "attack" in t.name or "failure" in t.name),
+                (t for t in matching if t.name.endswith("_insecure_failure") or "insecure" in t.name or "attack" in t.name or "failure" in t.name or "cross_account" in t.name),
                 None,
             )
             if attack_trace is not None:

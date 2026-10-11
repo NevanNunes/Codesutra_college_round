@@ -71,7 +71,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-import { FIXTURE_SCENARIOS, FIXTURE_RUN_DETAIL, FIXTURE_EVENTS } from './fixtures';
+import { FIXTURE_HEALTH, FIXTURE_SCENARIOS, FIXTURE_RUN_DETAIL, FIXTURE_EVENTS } from './fixtures';
 
 export const api = {
   async getHealth(): Promise<HealthResponse> {

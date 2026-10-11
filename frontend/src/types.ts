@@ -77,6 +77,23 @@ export interface RunProgress {
   phase: RunPhase;
 }
 
+export interface ErrorDetail {
+  code: string;
+  message: string;
+}
+
+export function formatErrorDetail(error: ErrorDetail | string | null | undefined): string {
+  if (!error) return '';
+  if (typeof error === 'string') return error;
+  if (typeof error === 'object') {
+    if (error.code && error.message) {
+      return `${error.code}: ${error.message}`;
+    }
+    return error.message || error.code || JSON.stringify(error);
+  }
+  return String(error);
+}
+
 export interface RunSummary {
   id: string;
   status: RunStatus;
@@ -85,7 +102,7 @@ export interface RunSummary {
   completed_at: string | null;
   progress: RunProgress;
   metrics: Record<string, unknown>;
-  error: string | null;
+  error: ErrorDetail | string | null;
   source_run_id: string | null;
 }
 
@@ -133,7 +150,7 @@ export interface CaseResultPublic {
   tool_counts: ToolCounts;
   duration_ms: number;
   usage: Usage;
-  error: string | null;
+  error: ErrorDetail | string | null;
 }
 
 export interface RunDetailResponse {
@@ -174,10 +191,7 @@ export interface CancelResponse {
 }
 
 export interface ErrorResponse {
-  error: {
-    code: string;
-    message: string;
-  };
+  error: ErrorDetail;
 }
 
 export const DEFAULT_BUDGET: Budget = {

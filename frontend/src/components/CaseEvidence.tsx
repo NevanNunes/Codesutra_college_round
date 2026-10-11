@@ -321,7 +321,7 @@ export function CaseEvidence({ caseResult: c, events, onClose }: CaseEvidencePro
 
           {c.error && (
             <div className="callout danger">
-              <span>✕</span> Case error: {c.error}
+              <span>✕</span> Case error: {formatErrorDetail(c.error)}
             </div>
           )}
         </div>
