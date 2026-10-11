@@ -23,7 +23,7 @@ from agentbreak.contracts import (
     TraceEvent,
     payload_sha256,
 )
-from agentbreak.fixtures import list_scenarios, load_snapshot
+from agentbreak.fixtures import list_benign_cases, list_scenarios, load_snapshot
 from agentbreak.fixtures.traces import (
     FixtureModelClient,
     FixtureTrace,
@@ -345,3 +345,146 @@ async def test_end_to_end_cross_account_case(dummy_app):
     assert res_gate.oracle_outcome == OracleOutcome.FAILURE
     assert len(res_gate.violations) == 0
     assert any(v.kind == "unauthorized_read" for v in res_gate.attempted_violations)
+
+
+# ----------------------------------------------------------------------
+# Section 7: Variant Task Coverage & Regression Tests
+# ----------------------------------------------------------------------
+
+def test_all_benign_task_variants_resolve_matching_traces(dummy_app, fixture_req):
+    """Verify that all 8 clean task variants resolve their matching fixture trace."""
+    benign_cases = list_benign_cases()
+    assert len(benign_cases) == 8
+
+    for bc in benign_cases:
+        spec = CaseSpec(
+            run_id=uuid4(),
+            trial_id=uuid4(),
+            scenario=bc.scenario,
+            candidate=None,
+            defense=DefensePreset.BASELINE,
+            execution_mode=ExecutionMode.FIXTURE,
+            fixture_snapshot=bc.fixture_snapshot,
+            budget=Budget(),
+            seed=1,
+            model_settings=ModelSettings(
+                provider="test",
+                target_model_id="test",
+                attacker_model_id="test",
+                temperature=0.0,
+                max_tokens=100,
+            ),
+            policy_version="baseline_v1",
+        )
+        client = _get_case_client(dummy_app, fixture_req, spec)
+        assert isinstance(client, FixtureModelClient)
+        assert client.trace.scenario_id == bc.scenario.id
+        assert client.trace.task_id == bc.scenario.task_id
+
+
+def test_each_doc_exfil_benign_variant_matches_expected_trace(dummy_app, fixture_req):
+    """Verify each specific doc_exfil benign variant selects its registered trace."""
+    expected = {
+        "doc_exfil.status_email": "doc_exfil_benign_success",
+        "doc_exfil.status_email_paraphrase": "doc_exfil_status_email_paraphrase_benign",
+        "doc_exfil.status_lookup_only": "doc_exfil_status_lookup_only_benign",
+        "doc_exfil.status_email_ignore_noise": "doc_exfil_status_email_ignore_noise_benign",
+    }
+    benign_cases = [bc for bc in list_benign_cases() if bc.scenario.id == "doc_exfil"]
+    assert len(benign_cases) == 4
+
+    for bc in benign_cases:
+        spec = CaseSpec(
+            run_id=uuid4(),
+            trial_id=uuid4(),
+            scenario=bc.scenario,
+            candidate=None,
+            defense=DefensePreset.BASELINE,
+            execution_mode=ExecutionMode.FIXTURE,
+            fixture_snapshot=bc.fixture_snapshot,
+            budget=Budget(),
+            seed=1,
+            model_settings=ModelSettings(
+                provider="test",
+                target_model_id="test",
+                attacker_model_id="test",
+                temperature=0.0,
+                max_tokens=100,
+            ),
+            policy_version="baseline_v1",
+        )
+        client = _get_case_client(dummy_app, fixture_req, spec)
+        assert isinstance(client, FixtureModelClient)
+        assert client.trace.name == expected[bc.scenario.task_id]
+
+
+def test_each_email_bola_benign_variant_matches_expected_trace(dummy_app, fixture_req):
+    """Verify each specific email_bola benign variant selects its registered trace."""
+    expected = {
+        "email_bola.ticket_summary": "email_bola_cross_account_read",
+        "email_bola.ticket_summary_paraphrase": "email_bola_ticket_summary_paraphrase_benign",
+        "email_bola.ticket_with_status": "email_bola_ticket_with_status_benign",
+        "email_bola.ticket_summary_email": "email_bola_ticket_summary_email_benign",
+    }
+    benign_cases = [bc for bc in list_benign_cases() if bc.scenario.id == "email_bola"]
+    assert len(benign_cases) == 4
+
+    for bc in benign_cases:
+        spec = CaseSpec(
+            run_id=uuid4(),
+            trial_id=uuid4(),
+            scenario=bc.scenario,
+            candidate=None,
+            defense=DefensePreset.BASELINE,
+            execution_mode=ExecutionMode.FIXTURE,
+            fixture_snapshot=bc.fixture_snapshot,
+            budget=Budget(),
+            seed=1,
+            model_settings=ModelSettings(
+                provider="test",
+                target_model_id="test",
+                attacker_model_id="test",
+                temperature=0.0,
+                max_tokens=100,
+            ),
+            policy_version="baseline_v1",
+        )
+        client = _get_case_client(dummy_app, fixture_req, spec)
+        assert isinstance(client, FixtureModelClient)
+        assert client.trace.name == expected[bc.scenario.task_id]
+
+
+@pytest.mark.asyncio
+async def test_end_to_end_doc_exfil_all_benign_variants_run_successfully(dummy_app, fixture_req):
+    """Verify that all doc_exfil benign variants execute through TargetRunner without error."""
+    doc_benign = [bc for bc in list_benign_cases() if bc.scenario.id == "doc_exfil"]
+    assert len(doc_benign) == 4
+
+    for bc in doc_benign:
+        sink = MemoryEventSink()
+        spec = CaseSpec(
+            run_id=uuid4(),
+            trial_id=uuid4(),
+            scenario=bc.scenario,
+            candidate=None,
+            defense=DefensePreset.BASELINE,
+            execution_mode=ExecutionMode.FIXTURE,
+            fixture_snapshot=bc.fixture_snapshot,
+            budget=Budget(),
+            seed=1,
+            model_settings=ModelSettings(
+                provider="test",
+                target_model_id="test",
+                attacker_model_id="test",
+                temperature=0.0,
+                max_tokens=100,
+            ),
+            policy_version="baseline_v1",
+        )
+        client = _get_case_client(dummy_app, fixture_req, spec)
+        runner = TargetRunner(client)
+        result = await runner.run_case(spec, sink)
+
+        assert result.status == CaseStatus.COMPLETED
+        assert result.benign_success is True
+

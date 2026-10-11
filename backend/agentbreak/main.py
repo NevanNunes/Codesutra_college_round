@@ -205,9 +205,9 @@ async def _execute_run(app: FastAPI, run_id: UUID, run: RunSummary, cancel_event
         )
         db.save_case_spec(run_id, spec)
 
-        case_client = _get_case_client(app, req, spec)
-        runner = TargetRunner(case_client)
         try:
+            case_client = _get_case_client(app, req, spec)
+            runner = TargetRunner(case_client)
             result = await asyncio.wait_for(
                 runner.run_case(spec, emit),
                 timeout=req.budget.case_timeout_s,
@@ -285,59 +285,59 @@ async def _execute_run(app: FastAPI, run_id: UUID, run: RunSummary, cancel_event
                 await emit(EventDraft(type=EventType.RUN_CANCELLED, data={}))
                 return
 
-        trial_id = uuid4()
-        scenario = scenarios[seed.candidate.scenario_id]
-        snapshot = load_snapshot(scenario.fixture_id)
+            trial_id = uuid4()
+            scenario = scenarios[seed.candidate.scenario_id]
+            snapshot = load_snapshot(scenario.fixture_id)
 
-        # Inject attack candidate text into the source document
-        injected_snapshot = copy.deepcopy(snapshot)
-        for doc in injected_snapshot.documents:
-            if doc.id == scenario.source_id:
-                doc.body = seed.candidate.text
+            # Inject attack candidate text into the source document
+            injected_snapshot = copy.deepcopy(snapshot)
+            for doc in injected_snapshot.documents:
+                if doc.id == scenario.source_id:
+                    doc.body = seed.candidate.text
 
-        spec = CaseSpec(
-            run_id=run_id, trial_id=trial_id, scenario=scenario,
-            candidate=seed.candidate, defense=req.defense, execution_mode=req.execution_mode,
-            fixture_snapshot=snapshot, budget=req.budget, seed=req.seed,
-            model_settings=model_settings, policy_version=policy_version,
-        )
-        db.save_case_spec(run_id, spec)
-        db.save_candidate(run_id, seed.candidate.model_dump_json(), str(seed.candidate.id))
-
-        # Emit candidate_generated
-        await emit(EventDraft(
-            trial_id=trial_id, type=EventType.CANDIDATE_GENERATED, data={
-                "candidate_id": str(seed.candidate.id),
-                "scenario_id": seed.candidate.scenario_id,
-                "strategy": seed.candidate.strategy,
-                "generation": seed.candidate.generation,
-                "payload_sha256": seed.candidate.payload_sha256,
-            }
-        ))
-
-        case_client = _get_case_client(app, req, spec)
-        runner = TargetRunner(case_client)
-        try:
-            result = await asyncio.wait_for(
-                runner.run_case(spec, emit),
-                timeout=req.budget.case_timeout_s,
+            spec = CaseSpec(
+                run_id=run_id, trial_id=trial_id, scenario=scenario,
+                candidate=seed.candidate, defense=req.defense, execution_mode=req.execution_mode,
+                fixture_snapshot=injected_snapshot, budget=req.budget, seed=req.seed,
+                model_settings=model_settings, policy_version=policy_version,
             )
-            completed_count += 1
-            all_results.append(result)
-        except (TimeoutError, asyncio.TimeoutError):
-            failed_count += 1
-            result = _make_timeout_result(spec)
-            all_results.append(result)
-        except asyncio.CancelledError:
-            raise
-        except Exception as exc:  # noqa: BLE001
-            failed_count += 1
-            result = _make_error_result(spec, exc)
-            all_results.append(result)
+            db.save_case_spec(run_id, spec)
+            db.save_candidate(run_id, seed.candidate.model_dump_json(), str(seed.candidate.id))
 
-        db.save_case_result(run_id, result)
-        progress = RunProgress(scheduled=total_scheduled, completed=completed_count, failed=failed_count, phase="attack")
-        db.update_run_progress(run_id, progress)
+            # Emit candidate_generated
+            await emit(EventDraft(
+                trial_id=trial_id, type=EventType.CANDIDATE_GENERATED, data={
+                    "candidate_id": str(seed.candidate.id),
+                    "scenario_id": seed.candidate.scenario_id,
+                    "strategy": seed.candidate.strategy,
+                    "generation": seed.candidate.generation,
+                    "payload_sha256": seed.candidate.payload_sha256,
+                }
+            ))
+
+            try:
+                case_client = _get_case_client(app, req, spec)
+                runner = TargetRunner(case_client)
+                result = await asyncio.wait_for(
+                    runner.run_case(spec, emit),
+                    timeout=req.budget.case_timeout_s,
+                )
+                completed_count += 1
+                all_results.append(result)
+            except (TimeoutError, asyncio.TimeoutError):
+                failed_count += 1
+                result = _make_timeout_result(spec)
+                all_results.append(result)
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                failed_count += 1
+                result = _make_error_result(spec, exc)
+                all_results.append(result)
+
+            db.save_case_result(run_id, result)
+            progress = RunProgress(scheduled=total_scheduled, completed=completed_count, failed=failed_count, phase="attack")
+            db.update_run_progress(run_id, progress)
 
     # Finalize
     progress = RunProgress(scheduled=total_scheduled, completed=completed_count, failed=failed_count, phase="done")
@@ -406,6 +406,10 @@ async def _execute_retest(app: FastAPI, run_id: UUID, run: RunSummary, config: d
         trial_id = uuid4()
         # Fresh snapshot, same fixture
         snapshot = load_snapshot(orig_spec.scenario.fixture_id)
+        if orig_spec.candidate is not None:
+            for doc in snapshot.documents:
+                if doc.id == orig_spec.scenario.source_id:
+                    doc.body = orig_spec.candidate.text
 
         new_spec = CaseSpec(
             run_id=run_id, trial_id=trial_id, scenario=orig_spec.scenario,
@@ -416,9 +420,9 @@ async def _execute_retest(app: FastAPI, run_id: UUID, run: RunSummary, config: d
         )
         db.save_case_spec(run_id, new_spec)
 
-        case_client = _get_case_client(app, req, new_spec)
-        runner = TargetRunner(case_client)
         try:
+            case_client = _get_case_client(app, req, new_spec)
+            runner = TargetRunner(case_client)
             result = await asyncio.wait_for(
                 runner.run_case(new_spec, emit),
                 timeout=req.budget.case_timeout_s,
@@ -506,7 +510,7 @@ def _get_case_client(app: FastAPI, req: RunRequest, spec: CaseSpec):
             return FixtureModelClient(matching[0])
         else:
             attack_trace = next(
-                (t for t in matching if t.name.endswith("_insecure_failure") or "insecure" in t.name or "attack" in t.name or "failure" in t.name),
+                (t for t in matching if t.name.endswith("_insecure_failure") or "insecure" in t.name or "attack" in t.name or "failure" in t.name or "cross_account" in t.name),
                 None,
             )
             if attack_trace is not None:

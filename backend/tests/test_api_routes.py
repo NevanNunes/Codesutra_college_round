@@ -18,6 +18,7 @@ from httpx import ASGITransport, AsyncClient
 os.environ.setdefault("ALLOW_LIVE_RUNS", "false")
 os.environ.setdefault("DATABASE_PATH", ":memory:")
 
+from agentbreak.contracts import RunStatus, ErrorDetail
 from agentbreak.main import create_app
 
 
@@ -193,6 +194,69 @@ class TestCancel:
         assert response.status_code == 202
         data = response.json()
         assert data["run_id"] == run_id
+
+
+# ------------------------------------------------------------------ retest
+class TestRetest:
+    async def test_retest_not_found(self, client):
+        fake_id = str(uuid4())
+        response = await client.post(f"/api/runs/{fake_id}/retest", json={"include_benign": True})
+        assert response.status_code == 404
+        assert response.json()["error"]["code"] == "not_found"
+
+    async def test_retest_queued_run_returns_409(self, client):
+        create_resp = await client.post("/api/runs", json={
+            "scenario_ids": ["doc_exfil"],
+            "execution_mode": "fixture",
+        })
+        run_id = create_resp.json()["run_id"]
+        response = await client.post(f"/api/runs/{run_id}/retest", json={"include_benign": True})
+        assert response.status_code == 409
+        data = response.json()
+        assert data["error"]["code"] == "invalid_transition"
+        assert "completed source run" in data["error"]["message"].lower()
+
+    async def test_retest_failed_run_returns_409(self, client, app):
+        create_resp = await client.post("/api/runs", json={
+            "scenario_ids": ["doc_exfil"],
+            "execution_mode": "fixture",
+        })
+        run_id = create_resp.json()["run_id"]
+        # Explicitly set run status to FAILED in DB to simulate failed run
+        db = app.state.db
+        from uuid import UUID
+        db.update_run_status(UUID(run_id), RunStatus.FAILED,
+                             ErrorDetail(code="run_error", message="Run failed: FixtureTraceNotFoundError"))
+        
+        response = await client.post(f"/api/runs/{run_id}/retest", json={"include_benign": True})
+        assert response.status_code == 409
+        data = response.json()
+        assert data["error"]["code"] == "invalid_transition"
+        assert "completed source run" in data["error"]["message"].lower()
+
+    async def test_retest_completed_run_accepted(self, client, app):
+        create_resp = await client.post("/api/runs", json={
+            "scenario_ids": ["doc_exfil"],
+            "execution_mode": "fixture",
+        })
+        run_id = create_resp.json()["run_id"]
+        # Mark source run as completed in DB
+        db = app.state.db
+        from uuid import UUID
+        db.update_run_status(UUID(run_id), RunStatus.COMPLETED)
+
+        response = await client.post(f"/api/runs/{run_id}/retest", json={"include_benign": True})
+        assert response.status_code == 202
+        data = response.json()
+        assert "run_id" in data
+        new_run_id = data["run_id"]
+        assert new_run_id != run_id
+
+        # Verify new run is stored with source_run_id linked
+        retest_run = db.get_run(UUID(new_run_id))
+        assert retest_run is not None
+        assert retest_run.source_run_id == UUID(run_id)
+        assert retest_run.status == RunStatus.QUEUED
 
 
 # ------------------------------------------------------------------ export
