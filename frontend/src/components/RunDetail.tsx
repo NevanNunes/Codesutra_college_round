@@ -6,7 +6,9 @@ import { CaseList } from './CaseList';
 import { CaseEvidence } from './CaseEvidence';
 import { EventGraph, EventList, EventDetail } from './EventGraph';
 import { GuardRetest } from './GuardRetest';
+import { Comparison } from './Comparison';
 import type { CaseResultPublic, TraceEvent } from '../types';
+import { TERMINAL_STATUSES } from '../types';
 
 type Tab = 'overview' | 'cases' | 'events' | 'guard' | 'comparison';
 
@@ -17,8 +19,17 @@ interface RunDetailProps {
   retestData?: { cases: CaseResultPublic[] };
 }
 
-export function RunDetail({ runId, onRetest, retestRunId }: RunDetailProps) {
+export function RunDetail({ runId, onRetest, retestRunId, retestData }: RunDetailProps) {
   const { run, cases, events, loading, error, disconnected, refresh } = useRunData(runId);
+  const isRetestRun = Boolean(run?.source_run_id);
+  const pairedRunId = isRetestRun ? run?.source_run_id : retestRunId;
+  const {
+    run: pairedRun,
+    cases: pairedCases,
+    loading: pairedLoading,
+    error: pairedError,
+  } = useRunData(pairedRunId ?? null);
+
   const [tab, setTab] = useState<Tab>('overview');
   const [selectedCase, setSelectedCase] = useState<CaseResultPublic | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<TraceEvent | null>(null);
@@ -54,6 +65,7 @@ export function RunDetail({ runId, onRetest, retestRunId }: RunDetailProps) {
   const handleRetest = (newRunId: string) => {
     setRetested(true);
     onRetest(newRunId);
+    setTab('comparison');
   };
 
   if (loading) {
@@ -76,12 +88,13 @@ export function RunDetail({ runId, onRetest, retestRunId }: RunDetailProps) {
 
   if (!run) return null;
 
+  const hasComparison = Boolean(pairedRunId);
   const TABS: { id: Tab; label: string }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'cases', label: `Cases (${cases.length})` },
     { id: 'events', label: `Events (${events.length})` },
     { id: 'guard', label: 'Guard & Retest' },
-    ...(retestRunId ? [{ id: 'comparison' as Tab, label: 'Comparison' }] : []),
+    ...(hasComparison ? [{ id: 'comparison' as Tab, label: 'Comparison' }] : []),
   ];
 
   return (
@@ -193,10 +206,41 @@ export function RunDetail({ runId, onRetest, retestRunId }: RunDetailProps) {
         />
       )}
 
-      {tab === 'comparison' && retestRunId && (
-        <div className="callout info">
-          <span>ℹ</span>
-          <span>Comparison data loads when the retest run (ID: <code>{retestRunId.slice(0, 8)}</code>) completes. Open the retest run from the sidebar.</span>
+      {tab === 'comparison' && (
+        <div>
+          {!pairedRunId ? (
+            <div className="callout info">
+              <span>ℹ</span>
+              <span>No paired baseline or retest run found for comparison. Run a retest from the &quot;Guard &amp; Retest&quot; tab first.</span>
+            </div>
+          ) : pairedLoading && pairedCases.length === 0 && (!retestData?.cases || retestData.cases.length === 0) ? (
+            <div className="empty-state">
+              <div className="spinner" />
+              <p>Loading paired run data for comparison...</p>
+            </div>
+          ) : pairedError ? (
+            <div className="callout danger">
+              <span>✕</span> Failed to load paired run ({pairedRunId.slice(0, 8)}): {pairedError}
+            </div>
+          ) : (
+            <>
+              {pairedRun && !TERMINAL_STATUSES.includes(pairedRun.status) && (
+                <div className="callout info mb-16">
+                  <span>ℹ</span>
+                  <span>
+                    Retest run (ID: <code>{pairedRunId.slice(0, 8)}</code>) is currently <strong>{pairedRun.status}</strong>.
+                    Results will update as cases complete.
+                  </span>
+                </div>
+              )}
+              <Comparison
+                baselineCases={isRetestRun ? pairedCases : cases}
+                retestCases={isRetestRun ? cases : (retestData?.cases ?? pairedCases)}
+                baselineRunId={isRetestRun ? (run.source_run_id ?? '') : run.id}
+                retestRunId={isRetestRun ? run.id : pairedRunId}
+              />
+            </>
+          )}
         </div>
       )}
     </div>
