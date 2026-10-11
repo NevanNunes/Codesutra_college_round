@@ -143,7 +143,11 @@ export function RunDetail({ runId, onRetest, retestRunId, retestData }: RunDetai
             selectedTrialId={selectedCase?.trial_id ?? null}
           />
           {selectedCase && (
-            <CaseEvidence caseResult={selectedCase} onClose={() => setSelectedCase(null)} />
+            <CaseEvidence
+              caseResult={selectedCase}
+              events={events.filter(e => e.trial_id === selectedCase.trial_id)}
+              onClose={() => setSelectedCase(null)}
+            />
           )}
         </>
       )}
