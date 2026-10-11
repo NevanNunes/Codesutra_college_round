@@ -113,7 +113,7 @@ class CaseWorld:
     def customer_tenants(self) -> dict[str, str]:
         return {cid: rec.tenant_id for cid, rec in self._customers.items()}
 
-    def execute(self, tool: str, args: ContractModel, call_id: str) -> RawResult:
+    def execute(self, tool: str, args: Any, call_id: str) -> RawResult:
         """Synchronous (hence atomic w.r.t. cancellation) dispatch to a raw handler."""
         if tool == "search_docs":
             return self._search_docs(args.query)

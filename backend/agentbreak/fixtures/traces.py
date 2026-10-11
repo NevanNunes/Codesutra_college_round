@@ -10,6 +10,7 @@ nothing about any live model's vulnerability. The client carries
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 from agentbreak.contracts import (
     ModelMessage, ModelReply, TextBlock, ToolCall, ToolSchema, ToolUseBlock, Usage,
@@ -34,6 +35,11 @@ class FixtureTraceExhausted(AssertionError):
     pass
 
 
+class FixtureTraceNotFoundError(LookupError, ValueError):
+    """Raised when no fixture trace matches a given scenario and task."""
+    pass
+
+
 class FixtureModelClient:
     """ModelClient double that replays a trace. Never falls back to anything else."""
 
@@ -54,7 +60,7 @@ class FixtureModelClient:
         return self._replies.pop(0)
 
 
-def _call(call_id: str, name: str, **arguments: object) -> ModelReply:
+def _call(call_id: str, name: str, **arguments: Any) -> ModelReply:
     return ModelReply(content=[ToolUseBlock(call=ToolCall(call_id=call_id, name=name, arguments=arguments))],
                       usage=Usage(input_tokens=50, output_tokens=10), stop_reason="tool_use",
                       model_id="fixture-target")

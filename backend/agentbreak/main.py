@@ -14,7 +14,7 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Request
@@ -473,47 +473,66 @@ def _get_policy_version(defense: DefensePreset) -> str:
 def _get_case_client(app: FastAPI, req: RunRequest, spec: CaseSpec):
     """Get the appropriate model client for a case."""
     if req.execution_mode == ExecutionMode.FIXTURE:
-        from agentbreak.fixtures.traces import FixtureModelClient, list_fixture_traces
+        from agentbreak.fixtures.traces import (
+            FixtureModelClient,
+            FixtureTraceNotFoundError,
+            list_fixture_traces,
+        )
+
         traces = list_fixture_traces()
-        # Find a trace matching the scenario and task
-        for trace in traces:
-            if trace.scenario_id == spec.scenario.id and trace.task_id == spec.scenario.task_id:
-                return FixtureModelClient(trace)
-        # Fallback to the first matching scenario trace
-        for trace in traces:
-            if trace.scenario_id == spec.scenario.id:
-                return FixtureModelClient(trace)
-        # Last resort: use the first trace
-        if traces:
-            return FixtureModelClient(traces[0])
-        return StubModelClient()
+        matching = [
+            t for t in traces
+            if t.scenario_id == spec.scenario.id and t.task_id == spec.scenario.task_id
+        ]
+        if not matching:
+            raise FixtureTraceNotFoundError(
+                f"No fixture trace found for scenario '{spec.scenario.id}' and task '{spec.scenario.task_id}'."
+            )
+
+        # If scenario/task has only one matching trace, preserve existing behavior
+        if len(matching) == 1:
+            return FixtureModelClient(matching[0])
+
+        # Distinguish benign from malicious trials:
+        # spec.candidate is None identifies benign trials; candidate is not None identifies attacks.
+        is_benign = spec.candidate is None
+        if is_benign:
+            benign_trace = next(
+                (t for t in matching if t.name.endswith("_benign_success") or "benign" in t.name),
+                None,
+            )
+            if benign_trace is not None:
+                return FixtureModelClient(benign_trace)
+            return FixtureModelClient(matching[0])
+        else:
+            attack_trace = next(
+                (t for t in matching if t.name.endswith("_insecure_failure") or "insecure" in t.name or "attack" in t.name or "failure" in t.name),
+                None,
+            )
+            if attack_trace is not None:
+                return FixtureModelClient(attack_trace)
+            return FixtureModelClient(matching[0])
+
     return getattr(app.state, "model_client", StubModelClient())
 
 
-def _compute_metrics(results: list[CaseResult]) -> dict:
-    """Try A's metrics; fallback to basic stats."""
-    try:
-        from agentbreak.evaluation import calculate_metrics
-        return calculate_metrics(results)
-    except (ImportError, AttributeError):
-        pass
-    # Basic fallback metrics
+
+def _compute_metrics(results: list[CaseResult]) -> dict[str, Any]:
+    """Calculate formal evaluation metrics using the authoritative evaluator."""
     if not results:
         return {}
-    total = len(results)
-    completed = sum(1 for r in results if r.status == CaseStatus.COMPLETED)
-    violations = sum(len(r.violations) for r in results)
-    benign_pass = sum(1 for r in results if r.benign_success is True)
-    benign_total = sum(1 for r in results if r.candidate_id is None)
-    attack_total = sum(1 for r in results if r.candidate_id is not None)
-    attack_success = sum(1 for r in results if r.candidate_id is not None and r.violations)
-    return {
-        "total_cases": total,
-        "completed_cases": completed,
-        "total_violations": violations,
-        "benign_pass_rate": benign_pass / benign_total if benign_total else None,
-        "attack_success_rate": attack_success / attack_total if attack_total else None,
-    }
+    try:
+        from agentbreak.evaluation import calculate_metrics
+
+        metrics = calculate_metrics(results)
+        if isinstance(metrics, dict):
+            return metrics
+        return metrics.model_dump(mode="json")
+    except Exception as exc:
+        logger.error("Failed to calculate evaluation metrics: %s", exc, exc_info=True)
+        raise
+
+
 
 
 def _make_timeout_result(spec: CaseSpec) -> CaseResult:

@@ -99,6 +99,13 @@ class Database:
             self._local.conn = conn
         return conn
 
+    def close(self) -> None:
+        """Close connection for current thread if open."""
+        conn = getattr(self._local, "conn", None)
+        if conn is not None:
+            conn.close()
+            self._local.conn = None
+
     def initialize(self) -> None:
         """Create tables and mark stale runs interrupted."""
         conn = self._conn()
