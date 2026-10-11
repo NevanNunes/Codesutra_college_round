@@ -6,6 +6,7 @@ import asyncio
 import copy
 import logging
 import time
+from typing import Any
 from uuid import UUID, uuid4
 
 from agentbreak.attacks.generator import AttackGenerator
@@ -48,15 +49,15 @@ class AdaptiveAttackEngine:
     async def run_campaign(
         self,
         db: Database,
-        emit: object,  # _DbEventSink
+        emit: Any,  # _DbEventSink
         run_id: UUID,
         req: RunRequest,
         scenario: ScenarioSpec,
         base_snapshot: FixtureSnapshot,
         policy_version: str,
-        case_client: object,
+        case_client: Any,
         cancel_event: asyncio.Event,
-        progress_updater: object, # Callable
+        progress_updater: Any,  # Callable
     ) -> list[CaseResult]:
         """Execute the bounded search loop for a single scenario."""
         
